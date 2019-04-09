@@ -36,6 +36,12 @@ An automatic configuration program for vim
     cd ~/.vimplus
     sudo ./install.sh
     ```
+- 终端无法找到字体Droid Sans Mono Nerd Font解决方法:
+    sudo apt-get install dconf-tools
+    fc-list|grep 'Nerd'
+![](./screenshots/1.png)
+    dconf-editor
+![](./screenshots/2.png)
 
 ### Centos
 
