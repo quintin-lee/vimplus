@@ -1,11 +1,18 @@
-"
-"             __                __          
-"     __   __/_/___ ___  ____  / /_  _______
-"     \ \ / / / __ `__ \/ __ \/ / / / / ___/
-"      \ V / / / / / / / /_/ / / /_/ (__  )
-"       \_/_/_/ /_/ /_/ ,___/_/\____/____/
-"                    /_/
-"            
+"   .  . .  .  . .  . S@t.. .  .  . .  .  . .  .  . .  .  . .  .  . .  .  . .  .  . .  .  . .  .  . .  .  . .  .  . .  ..
+"    .     ..t%SXSS%:;t.X8S% .   .      .       .       .       .       .       .       .       .       .       .       .
+"      . %St8;8:X;8:8:8%8;%%:@S:    . .    . .    ....    .  .    .  .    .  .    .  .    .  .    .  .    .  .    .  ....
+"  .    8: %.;t;S;%@88:X.8X8%;8S t@@%   .  %@@t  .X88X .      .       .   %@@@@@@@@@X:  .     .       .       .       .  
+"    ..X.;X%8t8%8ttX.88;8.8%:;% ;8:SX%.   SX.8S.  St88:  .  .   .  .    ..XS.@%SSS88S@:. X@@%  . . .    .  .    .  ......
+"   . X;:;8SS888;8tt;8:8:8; t:t8S 8:Xt.  :8888: .%888:.  .SSSSSSSSSSS%:  .S888t   @@8X: .%.88  .SSt  .:SS;  .%SSSSSSSS%. 
+"    :t8 :;X8S;8.8S;8S.8.t8:%8XS.. S8.8:.S8;8;  :@;@88 . S:88 X.88@88:@t..%S.  .. X;8@: :%:;8. X%:X;. 8;.;  %S8@XXSXSS8..
+"  .t88; X;8S8888;8S8t 8S88SSStt:. @.%8St;@8X  . t .8S   S:88:%888%;8t8:..S.S@%SSS8S88t .% @;  X:.X.  88t :.t@t8@ .......
+"  8; :888XSStS;88;88X%;;tt::;;8@ ..%X88:88Xt    .S@.::. S@8% X8.@;S888X .%;88SSSS.SX.:. 8S88: @;88t. 8.S8  t;@8@88@88S..
+"  S. :tX: ;%8S8 : .::. %8t  %S 8.  @88t8 8t.  . . .@8;  8888 @@%S;t8.8S .:SX8; .:.... . S8; ..8888:..8:8@: ;St@@888.@@..
+"    :8:;888888 .; .     8%8@       .8X.@8X  .    X%8@  .t@8S X88X:%888X .@8@8t  ..  .   SX%X .X;;S@%tS8; ;..SttSXS8888S.
+"    t.8XX;;8X% XX.  .    %8X8;   . :tX8@t     .  t8X8:  %@@S X8@@:t8tXt...:%t..       . X:8X  X8@@88@888t. %88t888 888t.
+"  .    :8;S: . S@.       t8;8:: .   .;:;. . .   .%@%:   t%%; .%%;..: t. .;  :  . . .    %;8.  ;X;X%.:.: t  ;t  ;:: :t;..
+"     :%@t%8   88.  .  .  :: . ..   .   .          .   . ..  .      ..   .    .       . . ... .   . .   .        ..      
+"      .. 8888   ..      ...   . .    .   .  . .     .   ..    .  .    .        .   .   . ..    .  .  .   .  . .     ....
 "
 " Author: chxuan <787280310@qq.com>
 " Repository: https://github.com/chxuan/vimplus
@@ -49,6 +56,7 @@ set smarttab             " 在行和段开始处使用制表符
 set nowrap               " 禁止折行
 set backspace=2          " 使用回车键正常处理indent,eol,start等
 set sidescroll=10        " 设置向右滚动字符数
+set nofoldenable         " 禁用折叠代码
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 代码补全
@@ -82,29 +90,55 @@ set encoding=utf8
 set fileencodings=utf8,ucs-bom,gbk,cp936,gb2312,gb18030
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" gvim/macvim设置
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("gui_running")
+    let system = system('uname -s')
+    if system == "Darwin\n"
+        set guifont=Droid\ Sans\ Mono\ Nerd\ Font\ Complete:h18 " 设置字体
+    else
+        set guifont=DroidSansMono\ Nerd\ Font\ Regular\ 18      " 设置字体
+    endif
+    set guioptions-=m           " 隐藏菜单栏
+    set guioptions-=T           " 隐藏工具栏
+    set guioptions-=L           " 隐藏左侧滚动条
+    set guioptions-=r           " 隐藏右侧滚动条
+    set guioptions-=b           " 隐藏底部滚动条
+    set showtabline=0           " 隐藏Tab栏
+    set guicursor=n-v-c:ver5    " 设置光标为竖线
+endif
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 卸载默认插件UnPlug
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! s:deregister(repo)
+  let repo = substitute(a:repo, '[\/]\+$', '', '')
+  let name = fnamemodify(repo, ':t:s?\.git$??')
+  call remove(g:plugs, name)
+endfunction
+command! -nargs=1 -bar UnPlug call s:deregister(<args>)
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 插件列表
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin('~/.vim/plugged')
 
 Plug 'chxuan/cpp-mode'
+Plug 'chxuan/vim-edit'
 Plug 'chxuan/change-colorscheme'
 Plug 'chxuan/prepare-code'
 Plug 'chxuan/vim-buffer'
-Plug 'chxuan/vim-replace'
 Plug 'chxuan/vimplus-startify'
 Plug 'chxuan/tagbar'
-"Plug 'Valloric/YouCompleteMe'
+Plug 'Valloric/YouCompleteMe'
 Plug 'Yggdroot/LeaderF'
 Plug 'mileszs/ack.vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'haya14busa/incsearch.vim'
-Plug 'iamcco/mathjax-support-for-mkdp'
-Plug 'iamcco/markdown-preview.vim'
 Plug 'jiangmiao/auto-pairs'
 Plug 'scrooloose/nerdtree'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'rkulla/pydiction'
 Plug 'godlygeek/tabular'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
@@ -114,7 +148,6 @@ Plug 'tpope/vim-endwise'
 Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'vim-scripts/txt.vim'
 Plug 'ryanoasis/vim-devicons'
 Plug 'junegunn/vim-slash'
 Plug 'junegunn/gv.vim'
@@ -125,33 +158,32 @@ Plug 'kana/vim-textobj-function'
 Plug 'sgur/vim-textobj-parameter'
 Plug 'Shougo/echodoc.vim'
 Plug 'terryma/vim-smooth-scroll'
-Plug 'terryma/vim-expand-region'
 Plug 'rhysd/clever-f.vim'
-Plug 'rhysd/github-complete.vim'
-Plug 'yianwillis/vimcdoc'
-Plug 'wakatime/vim-wakatime'
-Plug 'Yggdroot/indentLine'
-Plug 'vim-scripts/DoxygenToolkit.vim'
+Plug 'vim-scripts/indentpython.vim'
 
-call plug#end()            
+" 加载自定义插件
+if filereadable(expand($HOME . '/.vimrc.custom.plugins'))
+    source $HOME/.vimrc.custom.plugins
+endif
+
+call plug#end()  
 
 " load vim default plugin
 runtime macros/matchit.vim
 
-" 编辑vimrc文件
+" 编辑vimrc相关配置文件
 nnoremap <leader>e :edit $MYVIMRC<cr>
+nnoremap <leader>vc :edit ~/.vimrc.custom.config<cr>
+nnoremap <leader>vp :edit ~/.vimrc.custom.plugins<cr>
 
 " 查看vimplus的help文件
-nnoremap <leader>h :edit ~/.vimplus/help.md<cr>
+nnoremap <leader>h :view +let\ &l:modifiable=0 ~/.vimplus/help.md<cr>
 
 " 打开当前光标所在单词的vim帮助文档
 nnoremap <leader>H :execute ":help " . expand("<cword>")<cr>
 
 " 重新加载vimrc文件
 nnoremap <leader>s :source $MYVIMRC<cr>
-
-" 复制当前到行末
-nnoremap Y y$
 
 " 安装、更新、删除插件
 nnoremap <leader><leader>i :PlugInstall<cr>
@@ -164,10 +196,16 @@ nnoremap <c-k> <c-w>k
 nnoremap <c-h> <c-w>h
 nnoremap <c-l> <c-w>l
 
+" 复制当前选中到系统剪切板
+vmap <leader><leader>y "+y
+
+" 将系统剪切板内容粘贴到vim
+nnoremap <leader><leader>p "+p
+
 " 打开文件自动定位到最后编辑的位置
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif
 
-" 主题
+" 主题设置
 set background=dark
 let g:onedark_termcolors=256
 colorscheme molokai
@@ -176,7 +214,6 @@ colorscheme molokai
 let g:airline_theme="molokai"
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#buffer_nr_show = 1
 if !exists('g:airline_symbols')
     let g:airline_symbols = {}
 endif
@@ -206,21 +243,20 @@ inoremap <silent> <F12> <esc> :ShowColorScheme<cr>
 " prepare-code
 let g:prepare_code_plugin_path = expand($HOME . "/.vim/plugged/prepare-code")
 
-" vim-replace
-nnoremap <leader>r :ReplaceTo<space>
-
 " vim-buffer
 nnoremap <silent> <c-p> :PreviousBuffer<cr>
 nnoremap <silent> <c-n> :NextBuffer<cr>
 nnoremap <silent> <leader>d :CloseBuffer<cr>
 nnoremap <silent> <leader>D :BufOnly<cr>
 
+" vim-edit
+nnoremap Y :CopyText<cr>
+nnoremap D :DeleteText<cr>
+nnoremap C :ChangeText<cr>
+nnoremap <leader>r :ReplaceTo<space>
+
 " nerdtree
 nnoremap <silent> <leader>n :NERDTreeToggle<cr>
-inoremap <silent> <leader>n <esc> :NERDTreeToggle<cr>
-autocmd VimEnter * nested :NERDTree|wincmd w
-autocmd BufEnter * if ( winnr('$') == 1 && exists("b:NERDTree") ) | q | endif
-let g:NERDTreeWinSize = 20
 let g:NERDTreeFileExtensionHighlightFullName = 1
 let g:NERDTreeExactMatchHighlightFullName = 1
 let g:NERDTreePatternMatchHighlightFullName = 1
@@ -230,97 +266,62 @@ let g:NERDTreeDirArrowExpandable='▷'
 let g:NERDTreeDirArrowCollapsible='▼'
 
 " YCM
+" 如果不指定python解释器路径，ycm会自己搜索一个合适的(与编译ycm时使用的python版本匹配)
+" let g:ycm_server_python_interpreter = '/usr/bin/python2.7'
 let g:ycm_confirm_extra_conf = 0 
-let g:ycm_error_symbol = '>>'
-let g:ycm_warning_symbol = '>*'
+let g:ycm_error_symbol = '✗'
+let g:ycm_warning_symbol = '✹'
 let g:ycm_seed_identifiers_with_syntax = 1 
 let g:ycm_complete_in_comments = 1 
 let g:ycm_complete_in_strings = 1 
+let g:ycm_collect_identifiers_from_tags_files = 1
+let g:ycm_semantic_triggers =  {
+            \   'c' : ['->', '.','re![_a-zA-z0-9]'],
+            \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
+            \             're!\[.*\]\s'],
+            \   'ocaml' : ['.', '#'],
+            \   'cpp,objcpp' : ['->', '.', '::','re![_a-zA-Z0-9]'],
+            \   'perl' : ['->'],
+            \   'php' : ['->', '::'],
+            \   'cs,java,javascript,typescript,d,python,perl6,scala,vb,elixir,go' : ['.'],
+            \   'ruby' : ['.', '::'],
+            \   'lua' : ['.', ':'],
+            \   'erlang' : [':'],
+            \ }
 nnoremap <leader>u :YcmCompleter GoToDeclaration<cr>
 " 已经使用cpp-mode插件提供的转到函数实现的功能
-nnoremap <leader>i :YcmCompleter GoToDefinition<cr> 
+" nnoremap <leader>i :YcmCompleter GoToDefinition<cr> 
 nnoremap <leader>o :YcmCompleter GoToInclude<cr>
 nnoremap <leader>ff :YcmCompleter FixIt<cr>
 nmap <F5> :YcmDiags<cr>
 
-" ctags
-set tags+=/usr/include/tags
-set tags+=~/.vim/systags
-set tags+=~/.vim/x86_64-linux-gnu-systags
-let g:ycm_collect_identifiers_from_tags_files = 1
-let g:ycm_semantic_triggers =  {
-  \   'c' : ['->', '.','re![_a-zA-z0-9]'],
-  \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
-  \             're!\[.*\]\s'],
-  \   'ocaml' : ['.', '#'],
-  \   'cpp,objcpp' : ['->', '.', '::','re![_a-zA-Z0-9]'],
-  \   'perl' : ['->'],
-  \   'php' : ['->', '::'],
-  \   'cs,java,javascript,typescript,d,python,perl6,scala,vb,elixir,go' : ['.'],
-  \   'ruby' : ['.', '::'],
-  \   'lua' : ['.', ':'],
-  \   'erlang' : [':'],
-  \ }
-let g:ycm_semantic_triggers.c = ['->', '.', ' ', '(', '[', '&',']']
-
 " tagbar
-let g:tagbar_width = 20
-let g:tagbar_autofocus = 1
-autocmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx call tagbar#autoopen()
+let g:tagbar_width = 30
 nnoremap <silent> <leader>t :TagbarToggle<cr>
-inoremap <silent> <leader>t <esc> :TagbarToggle<cr>
-autocmd BufEnter __Tagbar__ nested call Window_Exit_Only_TagBar_NERDTree()
-
-function! Window_Exit_Only_TagBar_NERDTree()
-    if winbufnr(3) == -1 && exists('g:NERDTree') && g:NERDTree.IsOpen()
-        if tabpagenr('$') == 1
-            bdelete
-            quit
-        else
-            close
-        endif
-    endif
-endfunction
 
 " incsearch.vim
 map /  <Plug>(incsearch-forward)
 map ?  <Plug>(incsearch-backward)
 map g/ <Plug>(incsearch-stay)
 
-" markdown
-let uname = system('uname -s')
-if uname == "Darwin\n"
-    let g:mkdp_path_to_chrome = "/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome"
-else
-    let g:mkdp_path_to_chrome = '/usr/bin/google-chrome-stable %U'
-endif
-nmap <silent> <F7> <Plug>MarkdownPreview
-imap <silent> <F7> <Plug>MarkdownPreview
-nmap <silent> <F8> <Plug>StopMarkdownPreview
-imap <silent> <F8> <Plug>StopMarkdownPreview
-
 " vim-easymotion
 let g:EasyMotion_smartcase = 1
 map <leader>w <Plug>(easymotion-bd-w)
 nmap <leader>w <Plug>(easymotion-overwin-w)
 
-" pydiction
-let g:pydiction_location='~/.vim/plugged/pydiction/complete-dict'
-let g:pydiction_menu_height=10
-
 " nerdtree-git-plugin
 let g:NERDTreeIndicatorMapCustom = {
-    \ "Modified"  : "✹",
-    \ "Staged"    : "✚",
-    \ "Untracked" : "✭",
-    \ "Renamed"   : "➜",
-    \ "Unmerged"  : "═",
-    \ "Deleted"   : "✖",
-    \ "Dirty"     : "✗",
-    \ "Clean"     : "✔︎",
-    \ 'Ignored'   : '☒',
-    \ "Unknown"   : "?"
-    \ }
+            \ "Modified"  : "✹",
+            \ "Staged"    : "✚",
+            \ "Untracked" : "✭",
+            \ "Renamed"   : "➜",
+            \ "Unmerged"  : "═",
+            \ "Deleted"   : "✖",
+            \ "Dirty"     : "✗",
+            \ "Clean"     : "✔︎",
+            \ 'Ignored'   : '☒',
+            \ "Unknown"   : "?"
+            \ }
 
 " LeaderF
 nnoremap <leader>f :LeaderfFile ~<cr>
@@ -351,7 +352,7 @@ nnoremap <leader>g :GV<cr>
 nnoremap <leader>G :GV!<cr>
 nnoremap <leader>gg :GV?<cr>
 
-" 个性化
-if filereadable(expand($HOME . '/.vimrc.local'))
-    source $HOME/.vimrc.local
+" 加载自定义配置
+if filereadable(expand($HOME . '/.vimrc.custom.config'))
+    source $HOME/.vimrc.custom.config
 endif
