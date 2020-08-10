@@ -135,6 +135,7 @@ call plug#begin('~/.vim/plugged')
 "Plug 'chxuan/vim-buffer'
 Plug 'chxuan/vimplus-startify'
 Plug 'chxuan/tagbar'
+Plug 'Yggdroot/indentLine'
 "Plug 'Valloric/YouCompleteMe'
 Plug 'Yggdroot/LeaderF'
 Plug 'mileszs/ack.vim'
@@ -166,6 +167,10 @@ Plug 'junegunn/vim-slash'
 "Plug 'rhysd/clever-f.vim'
 "Plug 'vim-scripts/indentpython.vim'
 Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+Plug 'puremourning/vimspector' " plug for debug
+
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 
 " 加载自定义插件
 if filereadable(expand($HOME . '/.vimrc.custom.plugins'))
@@ -220,6 +225,9 @@ colorscheme molokai
 let g:airline_theme="molokai"
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#buffer_nr_show = 1
+" default.vim jsformatter.vim short_path.vim tabnr.vim unique_tail_improved.vim unique_tail.vim
+let g:airline#extensions#tabline#formatter = 'unique_tail'
 if !exists('g:airline_symbols')
     let g:airline_symbols = {}
 endif
@@ -365,12 +373,12 @@ inoremap <silent><expr> <c-space> coc#refresh()
 
 " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
 " position. Coc only does snippet and additional edit on confirm.
-if has('patch8.1.1068')
-  " Use `complete_info` if your (Neo)Vim version supports it.
-  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
-else
-  imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-endif
+"if has('patch8.1.1068')
+"  " Use `complete_info` if your (Neo)Vim version supports it.
+"  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+"else
+"  imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+"endif
 
 " Use `[g` and `]g` to navigate diagnostics
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
@@ -480,6 +488,36 @@ noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
 nnoremap <leader>g :GV<cr>
 nnoremap <leader>G :GV!<cr>
 nnoremap <leader>gg :GV?<cr>
+
+" vimspector
+let g:vimspector_enable_mappings = 'HUMAN'
+function! s:read_template_into_buffer(template)
+    " has to be a function to avoid the extra space fzf#run insers otherwise
+    execute '0r ~/.config/nvim/vimspector_json/'.a:template
+endfunction
+command! -bang -nargs=* LoadVimSpectorJsonTemplate call fzf#run({
+            \   'source': 'ls -1 ~/.config/nvim/vimspector_json',
+            \   'down': 20,
+            \   'sink': function('<sid>read_template_into_buffer')
+            \ })
+noremap <leader>vs :tabe .vimspector.json<CR>:LoadVimSpectorJsonTemplate<CR>
+sign define vimspectorBP text=🛑 texthl=Normal
+sign define vimspectorBPDisabled text=🚫 texthl=Normal
+sign define vimspectorPC text=👉 texthl=SpellBad
+" ===
+" === Create a _machine_specific.vim
+" ===
+let has_machine_specific_file = 1
+if empty(glob('~/.config/nvim/_machine_specific.vim'))
+    let has_machine_specific_file = 0
+    silent! exec "!cp ~/.config/nvim/default_configs/_machine_specific_default.vim ~/.config/nvim/_machine_specific.vim"
+endif
+source ~/.config/nvim/_machine_specific.vim
+
+" Open the _machine_specific.vim file if it has just been created
+if has_machine_specific_file == 0
+    exec "e ~/.config/nvim/_machine_specific.vim"
+endif
 
 " 加载自定义配置
 if filereadable(expand($HOME . '/.vimrc.custom.config'))
